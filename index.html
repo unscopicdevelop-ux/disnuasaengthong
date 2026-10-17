@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>รวมสมาชิกแก้ง</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--glass:rgba(255,255,255,.12);--line:rgba(255,255,255,.28);--txt:#fff;--dim:rgba(255,255,255,.7);--acc:#8dffd0}
+*{box-sizing:border-box;margin:0}
+html,body{cursor:none}
+a,button,input,.card{cursor:none}
+body{font-family:'Prompt',sans-serif;color:var(--txt);background:#0b1020 url(bg.png) center/cover fixed no-repeat;min-height:100vh;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;background:rgba(5,8,20,.35);z-index:0}
+#fx{position:fixed;inset:0;z-index:1;pointer-events:none}
+.glass{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%);box-shadow:0 8px 32px rgba(0,0,0,.25)}
+/* cursor */
+#cd,#cr{position:fixed;top:0;left:0;pointer-events:none;z-index:9999;border-radius:50%;transform:translate(-50%,-50%)}
+#cd{width:8px;height:8px;background:var(--acc)}
+#cr{width:34px;height:34px;border:1.5px solid rgba(255,255,255,.7);transition:width .2s,height .2s,background .2s}
+#cr.hot{width:54px;height:54px;background:rgba(141,255,208,.15)}
+@media(hover:none){html,body,a,button,input,.card{cursor:auto}#cd,#cr{display:none}}
+/* loader */
+#loader{position:fixed;inset:0;z-index:5000;background:#0b1020 url(bg.png) center/cover;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;transition:opacity .7s,visibility .7s}
+#loader::before{content:"";position:absolute;inset:0;background:rgba(5,8,20,.55)}
+#loader>*{position:relative}
+#loader.done{opacity:0;visibility:hidden}
+.ring{width:110px;height:110px;object-fit:contain;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5));animation:spin 2.2s linear infinite}
+.ring.stop{animation:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.bar{width:220px;height:4px;border-radius:4px;background:rgba(255,255,255,.2);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--acc);transition:width .3s}
+#enter{display:none;padding:10px 28px;border-radius:30px;color:#fff;font:inherit;font-size:15px}
+/* layout */
+main{position:relative;z-index:2}
+#home{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;text-align:center;padding:24px}
+#home img.logo{width:min(260px,60vw);filter:drop-shadow(0 10px 30px rgba(0,0,0,.45));animation:fl 6s ease-in-out infinite}
+@keyframes fl{50%{transform:translateY(-10px)}}
+#home p{color:var(--dim);font-weight:300}
+.btn{padding:13px 38px;border-radius:40px;color:#fff;font:500 16px 'Prompt';transition:background .2s,transform .2s}
+.btn:hover{background:rgba(255,255,255,.25);transform:translateY(-2px)}
+#members{display:none;max-width:1100px;margin:0 auto;padding:26px 18px 120px}
+.top{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.back{padding:8px 18px;border-radius:30px;color:#fff;font:400 14px 'Prompt'}
+#q{flex:1;min-width:200px;padding:11px 20px;border-radius:30px;color:#fff;font:400 15px 'Prompt';outline:none}
+#q::placeholder{color:var(--dim)}
+#q:focus{border-color:var(--acc)}
+#summary{display:flex;align-items:center;flex-wrap:wrap;gap:10px 22px;margin:0 0 10px;padding:12px 20px;border-radius:18px;font-size:13px;color:var(--dim);min-height:52px}
+#summary .tot{display:flex;align-items:baseline;gap:8px;padding-right:22px;border-right:1px solid var(--line)}
+#summary .tot b{font-size:28px;font-weight:600;color:var(--acc);line-height:1}
+#summary .tot span{color:#fff;font-size:14px}
+#summary .it b{color:#fff;font-weight:500;font-size:16px;margin-left:4px}
+.sum-msg{color:var(--dim)}
+.sec h2.in{animation:slideIn .6s cubic-bezier(.2,.8,.2,1) both}
+.card.in{animation:pop .55s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes pop{from{opacity:0;transform:translateY(22px) scale(.92)}to{opacity:1;transform:none}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes glow{0%,100%{box-shadow:0 8px 32px rgba(0,0,0,.25),0 0 0 0 rgba(141,255,208,.35)}50%{box-shadow:0 8px 32px rgba(0,0,0,.25),0 0 22px 4px rgba(141,255,208,.35)}}
+@keyframes shine{to{transform:translateX(260%) skewX(-20deg)}}
+.pg{animation:rise .6s cubic-bezier(.2,.8,.2,1) both}
+.pg.d1{animation-delay:.12s}.pg.d2{animation-delay:.24s}.pg.d3{animation-delay:.38s}
+#home .btn{animation:rise .6s .5s both,glow 3s 1.2s ease-in-out infinite;position:relative;overflow:hidden}
+.join{padding:8px 24px;font-size:13px;display:inline-block;text-decoration:none;background:rgba(88,101,242,.4);border-color:rgba(140,150,255,.6)}
+.join:hover{background:rgba(88,101,242,.65)}
+.btn::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-20deg)}
+.btn:hover::after{animation:shine .8s}
+.card{position:relative;--c:255,255,255}
+.card.r1,.card.r2,.card.r3{--c:255,205,70}
+.card.r1,.card.r2,.card.r3{border-color:rgba(var(--c),.85);background:linear-gradient(160deg,rgba(var(--c),.28),rgba(var(--c),.08));box-shadow:0 8px 32px rgba(0,0,0,.25),0 0 18px rgba(var(--c),.35)}
+.card.r1:hover,.card.r2:hover,.card.r3:hover{background:linear-gradient(160deg,rgba(var(--c),.38),rgba(var(--c),.14))}
+.card.r1::after,.card.r2::after,.card.r3::after{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;box-shadow:0 0 28px 4px rgba(var(--c),.6);animation:rk 2.4s ease-in-out infinite}
+@keyframes rk{0%,100%{opacity:.25}50%{opacity:1}}
+.card.r1 img,.card.r2 img,.card.r3 img{border-color:rgb(var(--c))}
+.card.r1 .n,.card.r2 .n,.card.r3 .n{color:rgb(var(--c))}
+.badge{position:absolute;top:9px;left:11px;width:30px;height:30px;display:grid;place-items:center;border-radius:50%;background:rgba(255,205,70,.18);border:1px solid rgba(255,205,70,.7);filter:drop-shadow(0 0 6px rgba(255,205,70,.7))}
+.badge svg{width:18px;height:18px;fill:#ffcd46}
+.hc{display:inline-flex;align-items:baseline;gap:6px;padding:4px 14px;border-radius:30px;font-size:11px}
+.hc b{font-size:14px;font-weight:600;color:var(--acc)}
+.card img{transition:transform .4s,border-color .3s}
+.card:hover img{transform:scale(1.08) rotate(-3deg);border-color:var(--acc)}
+.sec h2{font-size:22px;font-weight:500;margin:34px 4px 14px;display:flex;align-items:baseline;gap:10px}
+.sec h2 small{font-size:13px;color:var(--dim);font-weight:300}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+.card{border-radius:20px;padding:18px 14px;text-align:center;transition:transform .25s,background .25s}
+.card:hover{transform:translateY(-4px);background:rgba(255,255,255,.2)}
+.card img{width:84px;height:84px;border-radius:50%;object-fit:cover;border:2px solid var(--line);background:#222}
+.card .n{margin:10px 0 12px;font-weight:500;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card button{padding:6px 18px;border-radius:20px;color:#fff;font:400 13px 'Prompt';background:rgba(255,255,255,.14);border:1px solid var(--line)}
+.card button:hover{background:rgba(255,255,255,.3)}
+.empty{text-align:center;color:var(--dim);padding:60px 0}
+/* modal */
+#modal{position:fixed;inset:0;z-index:3000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:18px}
+#modal.on{display:flex;animation:fadeIn .25s}
+#modal.on .box{animation:pop .4s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes fadeIn{from{opacity:0}}
+#members.show{animation:rise .5s both}
+.box{width:min(460px,100%);max-height:88vh;overflow:auto;border-radius:24px;padding:26px;background:rgba(20,26,48,.55)}
+.box .hd{display:flex;gap:16px;align-items:center;margin-bottom:18px}
+.box .hd img{width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--line)}
+.box h3{font-weight:500;font-size:20px}
+.box .u{color:var(--dim);font-size:13px;font-weight:300}
+.row{display:flex;justify-content:space-between;gap:14px;padding:8px 0;border-top:1px solid rgba(255,255,255,.12);font-size:14px}
+.row span:first-child{color:var(--dim);flex:none}.row span:last-child{text-align:right;word-break:break-all}
+.roles{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 6px}
+.roles em{font-style:normal;font-size:12px;padding:4px 11px;border-radius:20px;background:rgba(255,255,255,.14);border:1px solid var(--line)}
+.x{float:right;font-size:22px;color:#fff;background:none;border:0}
+/* mini player */
+#pl{position:fixed;left:16px;bottom:16px;z-index:2500;display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:30px;font-size:12px}
+#pl button{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.14);color:#fff;font-size:12px}
+#trk{display:flex;gap:4px}
+#trk button{width:26px!important;height:26px!important;font-size:11px!important}
+#trk button.on{background:var(--acc)!important;color:#102018!important;border-color:var(--acc)!important}
+#trk button.miss{opacity:.35}
+#pl input{width:70px;accent-color:var(--acc)}
+</style>
+</head>
+<body>
+<div id="cd"></div><div id="cr"></div>
+<canvas id="fx"></canvas>
+
+<div id="loader">
+  <img class="ring" src="logo.png" alt="">
+  <div class="bar"><i id="lb"></i></div>
+  <div id="lt" style="font-weight:300;color:var(--dim)">กำลังโหลด...</div>
+  <button id="enter" class="glass">แตะเพื่อเข้าเว็บ</button>
+</div>
+
+<main>
+  <section id="home">
+    <div class="hc glass pg"><span>สมาชิกทั้งหมด</span><b id="hc">–</b><span>คน</span></div>
+    <img class="logo pg" src="logo.png" alt="logo">
+    <h1 class="pg d1" style="font-weight:500;font-size:clamp(26px,5vw,40px)">ดิสนัวแสงทอง</h1>
+    <p class="pg d2">รายชื่อสมาชิกดิสนัวแสงทอง</p>
+    <button class="btn glass" id="go">ดู สมาชิก</button>
+    <a class="btn glass join" href="https://discord.gg/h7QRzHtEM2" target="_blank" rel="noopener noreferrer">Join Server</a>
+  </section>
+
+  <section id="members">
+    <div class="top">
+      <button class="back glass" id="back">← กลับ</button>
+      <input id="q" class="glass" placeholder="ค้นหาชื่อ / username / nickname...">
+    </div>
+    <div id="summary" class="glass"><span class="sum-msg">กำลังโหลด...</span></div>
+    <div id="list"></div>
+  </section>
+</main>
+
+<div id="modal"><div class="box glass" id="box"></div></div>
+
+<div id="pl" class="glass">
+  <button id="pp" title="เล่น/หยุด">❚❚</button>
+  <div id="trk"><button data-i="0" title="เพลง 1">1</button><button data-i="1" title="เพลง 2">2</button><button data-i="2" title="เพลง 3">3</button></div>
+  <input id="vol" type="range" min="0" max="1" step=".05" value=".4" title="เสียง">
+</div>
+<audio id="au" src="music1.mp3" preload="auto"></audio>
+
+<script src="member.js" onerror="void 0"></script>
+<script>
+/* ===== ตั้งค่าลำดับยศ (บนสุด → ล่างสุด) ===== */
+const TOP='สุดหล่อของดิส', MEM='Member';       // MEM = Members + ยศอื่น ๆ ทั้งหมด
+const RANKS=[TOP,MEM];
+const LIMIT={[TOP]:10,[MEM]:15};               // จำนวนที่แสดงก่อนกด ดูเพิ่มเติม
+const FIRSTS=['asa_babymonster','hxttxkorn','g3tchei','gojoimareei','redaeng','ser_bass','_3an1ac','kritswift','time_thw','lavender753'];
+let view=null;                                  // null = ทุกยศ, หรือชื่อยศที่เปิดดูอยู่
+const $=s=>document.querySelector(s);
+
+/* ===== CSV ===== */
+function parseCSV(t){
+  t=t.replace(/^\uFEFF/,'');const rows=[];let r=[],f='',q=false;
+  for(let i=0;i<t.length;i++){const c=t[i];
+    if(q){if(c=='"'){if(t[i+1]=='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c=='"')q=true;else if(c==',')r.push(f),f='';
+    else if(c=='\n'){r.push(f);rows.push(r);r=[];f=''}else if(c!='\r')f+=c}
+  if(f||r.length){r.push(f);rows.push(r)}
+  const h=rows.shift().map(x=>x.trim());
+  return rows.filter(x=>x.length>1).map(x=>Object.fromEntries(h.map((k,i)=>[k,(x[i]||'').trim()])));
+}
+let members=[];
+function prep(rows){
+  members=rows.map(m=>{
+    const roles=m.role?m.role.split(',').map(s=>s.trim()).filter(Boolean):[];
+    const top=roles.includes(TOP)?TOP:MEM;
+    return {...m,roles,top,name:m['Display Name']||m.User};
+  });
+  $('#hc').textContent=members.length;$('#hc').dataset.n=members.length;
+  render();
+}
+function sortGroup(arr,rank){
+  return arr.sort((a,b)=>{
+    if(rank===TOP){const x=FIRSTS.indexOf(a.User),y=FIRSTS.indexOf(b.User);
+      if(x>-1||y>-1)return(x<0?99:x)-(y<0?99:y)}
+    return a.name.localeCompare(b.name,'th');
+  });
+}
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const FALL='https://cdn.discordapp.com/embed/avatars/0.png';
+let animate=true;
+const CROWN='<span class="badge" title="สุดหล่อ อันดับต้น"><svg viewBox="0 0 24 24"><path d="M3 7l4.5 4L12 4l4.5 7L21 7l-2 11H5L3 7zm2.6 13h12.8v2H5.6v-2z"/></svg></span>';
+const fmtAge=str=>{const d=new Date((str||'').replace(' ','T'));if(isNaN(d))return '';
+  const n=new Date();let y=n.getFullYear()-d.getFullYear();const an=new Date(d);an.setFullYear(d.getFullYear()+y);
+  if(an>n){y--;an.setFullYear(d.getFullYear()+y)}
+  const days=Math.floor((n-an)/864e5);return y>0?`${y} ปี ${days} วัน`:`${days} วัน`};
+function countUp(){document.querySelectorAll('[data-n]').forEach(el=>{const t=+el.dataset.n,t0=performance.now();
+  (function f(now){const p=Math.min((now-t0)/900,1);el.textContent=Math.round(t*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(f)})(t0)})}
+function render(){
+  const k=$('#q').value.trim().toLowerCase();
+  const hit=members.filter(m=>!k||[m.name,m.User,m.Nickname].some(v=>(v||'').toLowerCase().includes(k)));
+  const all=RANKS.map(r=>[r,sortGroup(hit.filter(m=>m.top===r),r)]).filter(g=>g[1].length);
+  const groups=view?all.filter(g=>g[0]===view):all;
+  const N=v=>animate?`<b data-n="${v}">0</b>`:`<b>${v}</b>`;
+  $('#summary').innerHTML=`<div class="tot">${N(hit.length)}<span>สมาชิกทั้งหมด</span></div>`+all.map(([r,a])=>`<span class="it">${esc(r)}${N(a.length)}</span>`).join('');
+  $('#back').textContent=view?'← ทุกยศ':'← กลับ';
+  const html=groups.length?groups.map(([r,a0])=>{const a=view?a0:a0.slice(0,LIMIT[r]);return `
+    <div class="sec"><h2 class="${animate?'in':''}">${esc(r)}<small>${a0.length} คน</small></h2>
+    <div class="grid">${a.map((m,i)=>{const rk=r===TOP?FIRSTS.indexOf(m.User):-1,top3=rk>-1&&rk<3;return `<div class="card glass${top3?' r'+(rk+1):''}${animate?' in':''}" style="${animate?`animation-delay:${Math.min(i,24)*45}ms`:''}">${top3?CROWN:''}
+      <img loading="lazy" src="${esc(m['avatar url']||FALL)}" onerror="this.src='${FALL}'" alt="">
+      <div class="n" title="${esc(m.name)}">${esc(m.name)}</div>
+      <button data-id="${esc(m.ID)}">ดูเพิ่มเติม</button></div>`}).join('')}</div>
+    ${a0.length>a.length?`<div style="text-align:center;margin-top:18px"><button class="btn glass" data-more="${esc(r)}">ดูเพิ่มเติม (อีก ${a0.length-a.length} คน)</button></div>`:''}</div>`}).join(''):'<div class="empty">ไม่พบสมาชิกที่ค้นหา</div>';
+  $('#list').innerHTML=html;
+  if(animate){countUp();animate=false}
+}
+function detail(id){
+  const m=members.find(x=>x.ID===id);if(!m)return;
+  const rw=(a,b)=>b?`<div class="row"><span>${a}</span><span>${esc(b)}</span></div>`:'';
+  $('#box').innerHTML=`<button class="x" id="cx">×</button>
+   <div class="hd"><img src="${esc(m['avatar url']||FALL)}" onerror="this.src='${FALL}'"><div><h3>${esc(m.name)}</h3><div class="u">@${esc(m.User)}</div></div></div>
+   <div class="roles">${m.roles.map(r=>`<em>${esc(r)}</em>`).join('')||'<em>ไม่มียศ</em>'}</div>
+   ${rw('Nickname',m.Nickname)}${rw('ID',m.ID)}${rw('สร้างบัญชี',m['Account Created Date'])}${rw('อายุบัญชี',fmtAge(m['Account Created Date']))}
+   ${rw('เข้าเซิร์ฟ',m['Joined Server Date'])}${rw('อยู่มาแล้ว',fmtAge(m['Joined Server Date']))}${rw('Invite',m['Invite Used'])}`;
+  $('#modal').classList.add('on');
+}
+$('#list').onclick=e=>{const mo=e.target.closest('[data-more]');if(mo){view=mo.dataset.more;animate=true;render();scrollTo(0,0);return}
+  const b=e.target.closest('button[data-id]');if(b)detail(b.dataset.id)};
+$('#modal').onclick=e=>{if(e.target.id==='modal'||e.target.id==='cx')$('#modal').classList.remove('on')};
+$('#q').oninput=render;
+$('#go').onclick=()=>{view=null;animate=true;render();$('#home').style.display='none';const M=$('#members');M.style.display='block';M.classList.remove('show');void M.offsetWidth;M.classList.add('show');scrollTo(0,0)};
+$('#back').onclick=()=>{if(view){view=null;animate=true;render();scrollTo(0,0);return}$('#members').style.display='none';$('#home').style.display='flex'};
+
+/* ===== โหลด member.csv ===== */
+const csvP=fetch('member.csv?v='+Date.now()).then(r=>{if(!r.ok)throw 0;return r.text()}).then(t=>prep(parseCSV(t)))
+  .catch(()=>{ // เปิดไฟล์ตรง ๆ (file://) เบราว์เซอร์บล็อก fetch → ใช้สำเนาใน member.js แทน
+    if(window.MEMBER_CSV)prep(parseCSV(window.MEMBER_CSV));
+    else $('#summary').innerHTML='<span>โหลด member.csv ไม่ได้ — ตรวจว่าไฟล์ชื่อ member.csv อยู่โฟลเดอร์เดียวกับ index.html และเปิดผ่านเว็บเซิร์ฟเวอร์</span>'});
+
+/* ===== loading ===== */
+const imgs=['bg.png','logo.png'];let n=0;
+const step=()=>{n++;$('#lb').style.width=(n/(imgs.length+2)*100)+'%'};
+Promise.all([...imgs.map(s=>new Promise(r=>{const i=new Image;i.onload=i.onerror=r;i.src=s})).map(p=>p.then(step)),
+  csvP.then(step),new Promise(r=>setTimeout(r,1500)).then(step)]).then(()=>{
+  $('.ring').classList.add('stop');$('#lt').textContent='พร้อมแล้ว';$('#enter').style.display='block'});
+$('#enter').onclick=()=>{setTimeout(countUp,400);$('#loader').classList.add('done');playMusic()};
+
+/* ===== เพลง ===== */
+const au=$('#au');au.volume=.4;
+const TRACKS=['music1.mp3','music2.mp3','music3.mp3'];let cur=0;
+function setTrack(i,play){cur=i;au.src=TRACKS[i];
+  document.querySelectorAll('#trk button').forEach((b,k)=>b.classList.toggle('on',k===i));
+  if(play)playMusic()}
+$('#trk').onclick=e=>{const b=e.target.closest('button[data-i]');if(b)setTrack(+b.dataset.i,true)};
+au.onended=()=>setTrack((cur+1)%TRACKS.length,true);   // จบเพลงแล้วเล่นเพลงถัดไปวนไป
+au.onerror=()=>document.querySelectorAll('#trk button')[cur].classList.add('miss');
+au.addEventListener('loadedmetadata',()=>document.querySelectorAll('#trk button')[cur].classList.remove('miss'));
+setTrack(0,false);
+function playMusic(){au.play().then(()=>$('#pp').textContent='❚❚').catch(()=>$('#pp').textContent='▶')}
+$('#pp').onclick=()=>{if(au.paused){au.play();$('#pp').textContent='❚❚'}else{au.pause();$('#pp').textContent='▶'}};
+$('#vol').oninput=e=>au.volume=e.target.value;
+
+/* ===== cursor ===== */
+const cd=$('#cd'),cr=$('#cr');let mx=0,my=0,rx=0,ry=0;
+addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cd.style.left=mx+'px';cd.style.top=my+'px';
+  cr.classList.toggle('hot',!!e.target.closest('button,input,.card,a'))});
+(function l(){rx+=(mx-rx)*.18;ry+=(my-ry)*.18;cr.style.left=rx+'px';cr.style.top=ry+'px';requestAnimationFrame(l)})();
+
+/* ===== particles ===== */
+const cv=$('#fx'),cx=cv.getContext('2d');let W,H,P=[];
+function rs(){W=cv.width=innerWidth;H=cv.height=innerHeight}rs();addEventListener('resize',rs);
+for(let i=0;i<70;i++)P.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*2.6+.6,vy:-(Math.random()*.4+.1),vx:(Math.random()-.5)*.3,a:Math.random()*.5+.2,p:Math.random()*6});
+(function d(){cx.clearRect(0,0,W,H);for(const p of P){p.y+=p.vy;p.x+=p.vx+Math.sin(p.p+=.01)*.2;
+  if(p.y<-10){p.y=H+10;p.x=Math.random()*W}
+  const g=cx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*4);g.addColorStop(0,`rgba(255,255,255,${p.a})`);g.addColorStop(1,'rgba(255,255,255,0)');
+  cx.fillStyle=g;cx.beginPath();cx.arc(p.x,p.y,p.r*4,0,7);cx.fill()}requestAnimationFrame(d)})();
+</script>
+</body>
+</html>
